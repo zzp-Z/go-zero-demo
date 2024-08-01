@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package user_server;
+option go_package = "./user_server";
+
+//  用户服务
+service UserServer {
+  rpc GetUser(UserIdReqVo) returns(UserInfoRespVo);// 获取用户信息
+  rpc UpdateUser(UpdateUserReqVo) returns(JwtTokenRespVo);// 更新用户
+  rpc CreateUser(CreateUserReqVo) returns(JwtTokenRespVo);// 创建用户
+  rpc Login(VerificationReqVo) returns(JwtTokenRespVo);// 登录
+  rpc DeleteUser(VerificationReqVo) returns(JwtTokenRespVo); // 删除用户
+}
+//  角色服务
+service RoleServer {
+  rpc CreateRole(CreateRoleReqVo) returns(RoleInfoRespVo);// 创建角色
+  rpc GetRole(RoleIdReqVo) returns(RoleInfoRespVo); // 获取角色信息
+  rpc DeleteRole(RoleIdReqVo) returns(RoleInfoRespVo); // 删除角色
+  rpc GetRoleList(Empty) returns(RoleInfoListRespVo); // 获取角色列表
+}
+// 用户角色服务
+service UserRoleServer {
+  rpc AssignRoleToUser(UserRoleReqVo) returns (UserRoleRespVo);// 分配角色给用户
+  rpc RemoveRoleFromUser(UserRoleReqVo) returns (UserRoleRespVo);// 移除用户的角色
+  rpc GetRolesByUser(UserIdReqVo) returns (UserRolesRespVo); // 获取用户角色
+  rpc GetUsersByRole(RoleIdReqVo) returns (RoleUsersRespVo); // 获取角色用户
+}
+
+// 请求消息
+message UserIdReqVo {
+  // 用户id Req
+  int64 id = 1;
+}
+message CreateUserReqVo {
+  // 创建用户 Req
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+message UpdateUserReqVo {
+  // 更新用户 Req
+  string new_name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message VerificationReqVo {
+  // 验证 Req
+  string email = 1;
+  string password = 2;
+}
+
+message RoleIdReqVo {
+  // 角色id Req
+  int64 id = 1;
+}
+message CreateRoleReqVo {
+  // 创建角色 Req
+  string name = 1;
+}
+message UserRoleReqVo {
+  //  用户角色 Req
+  int64 user_id = 1;
+  int64 role_id = 2;
+}
+
+// 响应消息
+message UserInfoRespVo {
+  // 用户信息 Resp
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+}
+message JwtTokenRespVo {
+  // token Resp
+  string token = 1;
+}
+
+message RoleInfoRespVo {
+  // 角色信息 Resp
+  int64 id = 1;
+  string name = 2;
+}
+message RoleInfoListRespVo {
+  // 角色信息列表 Resp
+  repeated RoleInfoRespVo role_list = 1;
+}
+message UserRoleRespVo {
+  //  用户角色 Resp
+  int64 user_id = 1;
+  int64 role_id = 2;
+}
+message UserRolesRespVo {
+  //  用户角色列表 Resp
+  repeated RoleInfoRespVo roles = 1;
+}
+
+message RoleUsersRespVo {
+  //  角色用户列表 Resp
+  repeated UserInfoRespVo users = 1;
+}
+// 空消息
+message Empty {}
