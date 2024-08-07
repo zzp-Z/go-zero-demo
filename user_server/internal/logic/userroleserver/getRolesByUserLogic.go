@@ -32,14 +32,17 @@ func NewGetRolesByUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ge
 }
 
 func (l *GetRolesByUserLogic) GetRolesByUser(in *user_server.UserIdReqVo) (*user_server.UserRolesRespVo, error) {
+	// 被权限校验依赖，不能添加权限校验
+	/*
+		1. 查询用户角色
+		2. 遍历用户角色id列表
+		3. 查询角色
+		4. 封装角色信息
+	*/
 	// 查询用户角色
 	userRoles, err := l.userRoleModel.FindByUserId(l.ctx, in.Id)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("GRU303：查询失败, err: %v", err)
-		return nil, &logic.AppError{
-			Code:    "GRU303",
-			Message: "查询失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "GRU303", "查询失败", err)
 	}
 	// 遍历用户角色id列表
 	roles := make([]*user_server.RoleInfoRespVo, 0, len(userRoles))

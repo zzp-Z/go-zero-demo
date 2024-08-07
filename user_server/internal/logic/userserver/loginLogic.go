@@ -32,26 +32,14 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 func (l *LoginLogic) Login(in *user_server.VerificationReqVo) (*user_server.JwtTokenRespVo, error) {
 	user, err := l.userModel.FindOneByEmail(l.ctx, in.Email)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("LF036：用户不存在 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "LF036",
-			Message: "用户不存在",
-		}
+		return nil, logic.NewAppError(l.ctx, "LF036", "用户不存在", err)
 	}
 	if user.DeletedAt.Valid {
-		logx.WithContext(l.ctx).Errorf("LF035：用户已被删除 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "LF035",
-			Message: "用户已被删除",
-		}
+		return nil, logic.NewAppError(l.ctx, "LF035", "用户已被删除", err)
 
 	}
 	if !l.Tools.CheckPassword(in.Password, user.Password) {
-		logx.WithContext(l.ctx).Errorf("LF037：密码错误 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "LF037",
-			Message: "密码错误",
-		}
+		return nil, logic.NewAppError(l.ctx, "LF037", "密码错误", nil)
 	}
 	token, err := l.Tools.GenerateJwtToken(user.Id)
 

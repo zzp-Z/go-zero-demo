@@ -28,14 +28,14 @@ func NewGetUsersByRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ge
 }
 
 func (l *GetUsersByRoleLogic) GetUsersByRole(in *user_server.RoleIdReqVo) (*user_server.RoleUsersRespVo, error) {
+	/*
+		1. 查询用户id列表
+		2. 遍历查询用户信息
+	*/
 	// 查询用户角色
 	roleUsers, err := l.userRoleModel.FindByRoleId(l.ctx, in.Id)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("GUR301：查询角色用户失败, err：%v", err)
-		return nil, &logic.AppError{
-			Code:    "GUR301",
-			Message: "查询角色用户失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "GUR301", "查询角色用户失败", err)
 	}
 	users := make([]*user_server.UserInfoRespVo, 0, len(roleUsers))
 	for _, roleUser := range roleUsers {

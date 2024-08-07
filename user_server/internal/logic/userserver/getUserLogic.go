@@ -30,11 +30,7 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 func (l *GetUserLogic) GetUser(in *user_server.UserIdReqVo) (*user_server.UserInfoRespVo, error) {
 	user, err := l.userModel.FindOne(l.ctx, uint64(in.Id))
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("GU301：用户不存在 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "GU301",
-			Message: "用户不存在",
-		}
+		return nil, logic.NewAppError(l.ctx, "GU301", "用户不存在", err)
 	}
 
 	return &user_server.UserInfoRespVo{

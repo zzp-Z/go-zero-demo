@@ -22,21 +22,25 @@ func NewUserRoleServerServer(svcCtx *svc.ServiceContext) *UserRoleServerServer {
 	}
 }
 
+// 分配角色给用户
 func (s *UserRoleServerServer) AssignRoleToUser(ctx context.Context, in *user_server.UserRoleReqVo) (*user_server.UserRoleRespVo, error) {
 	l := userroleserverlogic.NewAssignRoleToUserLogic(ctx, s.svcCtx)
 	return l.AssignRoleToUser(in)
 }
 
+// 移除用户的角色
 func (s *UserRoleServerServer) RemoveRoleFromUser(ctx context.Context, in *user_server.UserRoleReqVo) (*user_server.UserRoleRespVo, error) {
 	l := userroleserverlogic.NewRemoveRoleFromUserLogic(ctx, s.svcCtx)
 	return l.RemoveRoleFromUser(in)
 }
 
+// 获取用户角色
 func (s *UserRoleServerServer) GetRolesByUser(ctx context.Context, in *user_server.UserIdReqVo) (*user_server.UserRolesRespVo, error) {
 	l := userroleserverlogic.NewGetRolesByUserLogic(ctx, s.svcCtx)
 	return l.GetRolesByUser(in)
 }
 
+// 获取角色用户
 func (s *UserRoleServerServer) GetUsersByRole(ctx context.Context, in *user_server.RoleIdReqVo) (*user_server.RoleUsersRespVo, error) {
 	l := userroleserverlogic.NewGetUsersByRoleLogic(ctx, s.svcCtx)
 	return l.GetUsersByRole(in)

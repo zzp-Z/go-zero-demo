@@ -32,34 +32,17 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 func (l *DeleteUserLogic) DeleteUser(in *user_server.VerificationReqVo) (*user_server.JwtTokenRespVo, error) {
 	user, err := l.userModel.FindOneByEmail(l.ctx, in.Email)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("DU036：账号未找到 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "DU036",
-			Message: "账号未找到",
-		}
+		return nil, logic.NewAppError(l.ctx, "DU036", "账号未找到", err)
 	}
 	if user.DeletedAt.Valid {
-		logx.WithContext(l.ctx).Errorf("DU035：用户已被删除 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "DU035",
-			Message: "用户已被删除",
-		}
-
+		return nil, logic.NewAppError(l.ctx, "DU035", "用户已被删除", nil)
 	}
 	if !l.Tools.CheckPassword(in.Password, user.Password) {
-		logx.WithContext(l.ctx).Errorf("DU037：密码错误 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "DU037",
-			Message: "密码错误",
-		}
+		return nil, logic.NewAppError(l.ctx, "DU037", "密码错误", nil)
 	}
 	err = l.userModel.Delete(l.ctx, user.Id)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("DU038：删除用户失败 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "DU038",
-			Message: "删除用户失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "DU038", "删除用户失败", err)
 	}
 	token, err := l.Tools.GenerateJwtToken(user.Id)
 

@@ -1,0 +1,22 @@
+# 以下内容是配置文件模板，请根据实际情况修改，并修改文件名为userServer.yaml
+Name: userServer.rpc
+ListenOn: 0.0.0.0:30000
+DataSource: "root:88888888@tcp(127.0.0.1:3306)/user_server"
+
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: userServer.rpc
+
+Cache:
+  - Type: "node"
+    Host: "127.0.0.1:6379"
+    Pass: "123123"  # 如果 Redis 没有密码，可以留空
+    Weight: 100
+Log:
+  ServiceName: "userServer"
+  Mode: "file"
+  Path: "./logs"
+  Level: "info"
+
+Mode: dev

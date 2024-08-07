@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"user_server/internal/config"
+	permissionsServer "user_server/internal/server/permissions"
+	rolepermissionsServer "user_server/internal/server/rolepermissions"
 	roleserverServer "user_server/internal/server/roleserver"
+	userpermissionsServer "user_server/internal/server/userpermissions"
 	userroleserverServer "user_server/internal/server/userroleserver"
 	userserverServer "user_server/internal/server/userserver"
 	"user_server/internal/svc"
@@ -31,6 +34,9 @@ func main() {
 		user_server.RegisterUserServerServer(grpcServer, userserverServer.NewUserServerServer(ctx))
 		user_server.RegisterRoleServerServer(grpcServer, roleserverServer.NewRoleServerServer(ctx))
 		user_server.RegisterUserRoleServerServer(grpcServer, userroleserverServer.NewUserRoleServerServer(ctx))
+		user_server.RegisterPermissionsServer(grpcServer, permissionsServer.NewPermissionsServer(ctx))
+		user_server.RegisterRolePermissionsServer(grpcServer, rolepermissionsServer.NewRolePermissionsServer(ctx))
+		user_server.RegisterUserPermissionsServer(grpcServer, userpermissionsServer.NewUserPermissionsServer(ctx))
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)

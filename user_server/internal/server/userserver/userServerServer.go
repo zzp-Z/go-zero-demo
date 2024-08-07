@@ -22,26 +22,31 @@ func NewUserServerServer(svcCtx *svc.ServiceContext) *UserServerServer {
 	}
 }
 
+// 获取用户信息
 func (s *UserServerServer) GetUser(ctx context.Context, in *user_server.UserIdReqVo) (*user_server.UserInfoRespVo, error) {
 	l := userserverlogic.NewGetUserLogic(ctx, s.svcCtx)
 	return l.GetUser(in)
 }
 
+// 更新用户信息
 func (s *UserServerServer) UpdateUser(ctx context.Context, in *user_server.UpdateUserReqVo) (*user_server.JwtTokenRespVo, error) {
 	l := userserverlogic.NewUpdateUserLogic(ctx, s.svcCtx)
 	return l.UpdateUser(in)
 }
 
+// 创建新用户
 func (s *UserServerServer) CreateUser(ctx context.Context, in *user_server.CreateUserReqVo) (*user_server.JwtTokenRespVo, error) {
 	l := userserverlogic.NewCreateUserLogic(ctx, s.svcCtx)
 	return l.CreateUser(in)
 }
 
+// 用户登录
 func (s *UserServerServer) Login(ctx context.Context, in *user_server.VerificationReqVo) (*user_server.JwtTokenRespVo, error) {
 	l := userserverlogic.NewLoginLogic(ctx, s.svcCtx)
 	return l.Login(in)
 }
 
+// 删除用户
 func (s *UserServerServer) DeleteUser(ctx context.Context, in *user_server.VerificationReqVo) (*user_server.JwtTokenRespVo, error) {
 	l := userserverlogic.NewDeleteUserLogic(ctx, s.svcCtx)
 	return l.DeleteUser(in)

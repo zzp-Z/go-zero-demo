@@ -19,9 +19,13 @@ go build -o ./build/UserServer.exe ./cmd/userserver.go
 
 ```bash
 # 编译 迁移工具
-go build -o ./build/UserDatabaseMigration.exe ./migration/UserDatabaseMigration.go
+go build -o ./build/UserModel.exe ./migration/UserDatabaseMigration.go
 ```
 ```bash
 # 运行迁移工具
-./build/UserDatabaseMigration.exe
+./build/UserModel.exe
+```
+```bash
+# 构建镜像
+docker build -t go_user_server:v1 .
 ```

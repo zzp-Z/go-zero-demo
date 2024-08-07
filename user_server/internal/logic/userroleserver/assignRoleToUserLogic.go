@@ -29,7 +29,10 @@ func NewAssignRoleToUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *AssignRoleToUserLogic) AssignRoleToUser(in *user_server.UserRoleReqVo) (*user_server.UserRoleRespVo, error) {
-	//sql.NullInt64
+	/*
+		1. 用户id与角色id转换为sql.NullInt64
+		2. 插入数据
+	*/
 	userId := sql.NullInt64{Int64: in.UserId, Valid: true}
 	roleId := sql.NullInt64{Int64: in.RoleId, Valid: true}
 	_, err := l.userRoleModel.Insert(l.ctx, &model.UserRole{
@@ -37,11 +40,7 @@ func (l *AssignRoleToUserLogic) AssignRoleToUser(in *user_server.UserRoleReqVo) 
 		RoleId: roleId,
 	})
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("ARU301：添加失败, err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "ARU301",
-			Message: "添加失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "ARU301", "添加失败", err)
 	}
 
 	return &user_server.UserRoleRespVo{

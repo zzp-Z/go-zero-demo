@@ -28,13 +28,13 @@ func NewGetRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetRoleLo
 }
 
 func (l *GetRoleLogic) GetRole(in *user_server.RoleIdReqVo) (*user_server.RoleInfoRespVo, error) {
+	/*
+		1. 获取角色
+		2. 返回角色
+	*/
 	role, err := l.roleModel.FindOne(l.ctx, uint64(in.Id))
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("GR301：角色未找到, err: %v", err)
-		return nil, &logic.AppError{
-			Code:    "GR301",
-			Message: "角色未找到",
-		}
+		return nil, logic.NewAppError(l.ctx, "GR301", "角色未找到", err)
 	}
 
 	return &user_server.RoleInfoRespVo{
