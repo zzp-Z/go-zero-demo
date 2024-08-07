@@ -28,35 +28,22 @@ func NewCreateRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 }
 
 func (l *CreateRoleLogic) CreateRole(in *user_server.CreateRoleReqVo) (*user_server.RoleInfoRespVo, error) {
+	/*
+		1. 创建角色
+	*/
 	result, err := l.roleModel.Insert(l.ctx, &model.Role{
 		Name:   in.Name,
 		Status: "0",
 	})
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("CR362：创建角色失败, err：%v", err)
-		return nil, &logic.AppError{
-			Code:    "CR362",
-			Message: "创建角色失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "CR362", "创建角色失败", err)
 	}
 	roleId, err := result.LastInsertId()
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("CR363：创建角色成功，查询id失败, err：%v", err)
-		return nil, &logic.AppError{
-			Code:    "CR363",
-			Message: "创建角色成功，查询id失败",
-		}
-	}
-	role, err := l.roleModel.FindOne(l.ctx, uint64(roleId))
-	if err != nil {
-		logx.WithContext(l.ctx).Errorf("CR364：创建角色成功，查询角色失败, err：%v", err)
-		return nil, &logic.AppError{
-			Code:    "CR364",
-			Message: "创建角色成功，查询角色失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "CR363", "创建角色成功，查询id失败", err)
 	}
 	return &user_server.RoleInfoRespVo{
 		Id:   roleId,
-		Name: role.Name,
+		Name: in.Name,
 	}, nil
 }

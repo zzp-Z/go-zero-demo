@@ -30,12 +30,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-//	用户服务
+// 用户服务
 type UserServerClient interface {
+	// 获取用户信息
 	GetUser(ctx context.Context, in *UserIdReqVo, opts ...grpc.CallOption) (*UserInfoRespVo, error)
+	// 更新用户信息
 	UpdateUser(ctx context.Context, in *UpdateUserReqVo, opts ...grpc.CallOption) (*JwtTokenRespVo, error)
+	// 创建新用户
 	CreateUser(ctx context.Context, in *CreateUserReqVo, opts ...grpc.CallOption) (*JwtTokenRespVo, error)
+	// 用户登录
 	Login(ctx context.Context, in *VerificationReqVo, opts ...grpc.CallOption) (*JwtTokenRespVo, error)
+	// 删除用户
 	DeleteUser(ctx context.Context, in *VerificationReqVo, opts ...grpc.CallOption) (*JwtTokenRespVo, error)
 }
 
@@ -101,12 +106,17 @@ func (c *userServerClient) DeleteUser(ctx context.Context, in *VerificationReqVo
 // All implementations must embed UnimplementedUserServerServer
 // for forward compatibility
 //
-//	用户服务
+// 用户服务
 type UserServerServer interface {
+	// 获取用户信息
 	GetUser(context.Context, *UserIdReqVo) (*UserInfoRespVo, error)
+	// 更新用户信息
 	UpdateUser(context.Context, *UpdateUserReqVo) (*JwtTokenRespVo, error)
+	// 创建新用户
 	CreateUser(context.Context, *CreateUserReqVo) (*JwtTokenRespVo, error)
+	// 用户登录
 	Login(context.Context, *VerificationReqVo) (*JwtTokenRespVo, error)
+	// 删除用户
 	DeleteUser(context.Context, *VerificationReqVo) (*JwtTokenRespVo, error)
 	mustEmbedUnimplementedUserServerServer()
 }
@@ -276,11 +286,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-//	角色服务
+// 角色服务
 type RoleServerClient interface {
+	// 创建新角色
 	CreateRole(ctx context.Context, in *CreateRoleReqVo, opts ...grpc.CallOption) (*RoleInfoRespVo, error)
+	// 获取角色信息
 	GetRole(ctx context.Context, in *RoleIdReqVo, opts ...grpc.CallOption) (*RoleInfoRespVo, error)
+	// 删除角色
 	DeleteRole(ctx context.Context, in *RoleIdReqVo, opts ...grpc.CallOption) (*RoleInfoRespVo, error)
+	// 获取角色列表
 	GetRoleList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RoleInfoListRespVo, error)
 }
 
@@ -336,11 +350,15 @@ func (c *roleServerClient) GetRoleList(ctx context.Context, in *Empty, opts ...g
 // All implementations must embed UnimplementedRoleServerServer
 // for forward compatibility
 //
-//	角色服务
+// 角色服务
 type RoleServerServer interface {
+	// 创建新角色
 	CreateRole(context.Context, *CreateRoleReqVo) (*RoleInfoRespVo, error)
+	// 获取角色信息
 	GetRole(context.Context, *RoleIdReqVo) (*RoleInfoRespVo, error)
+	// 删除角色
 	DeleteRole(context.Context, *RoleIdReqVo) (*RoleInfoRespVo, error)
+	// 获取角色列表
 	GetRoleList(context.Context, *Empty) (*RoleInfoListRespVo, error)
 	mustEmbedUnimplementedRoleServerServer()
 }
@@ -487,9 +505,13 @@ const (
 //
 // 用户角色服务
 type UserRoleServerClient interface {
+	// 分配角色给用户
 	AssignRoleToUser(ctx context.Context, in *UserRoleReqVo, opts ...grpc.CallOption) (*UserRoleRespVo, error)
+	// 移除用户的角色
 	RemoveRoleFromUser(ctx context.Context, in *UserRoleReqVo, opts ...grpc.CallOption) (*UserRoleRespVo, error)
+	// 获取用户角色
 	GetRolesByUser(ctx context.Context, in *UserIdReqVo, opts ...grpc.CallOption) (*UserRolesRespVo, error)
+	// 获取角色用户
 	GetUsersByRole(ctx context.Context, in *RoleIdReqVo, opts ...grpc.CallOption) (*RoleUsersRespVo, error)
 }
 
@@ -547,9 +569,13 @@ func (c *userRoleServerClient) GetUsersByRole(ctx context.Context, in *RoleIdReq
 //
 // 用户角色服务
 type UserRoleServerServer interface {
+	// 分配角色给用户
 	AssignRoleToUser(context.Context, *UserRoleReqVo) (*UserRoleRespVo, error)
+	// 移除用户的角色
 	RemoveRoleFromUser(context.Context, *UserRoleReqVo) (*UserRoleRespVo, error)
+	// 获取用户角色
 	GetRolesByUser(context.Context, *UserIdReqVo) (*UserRolesRespVo, error)
+	// 获取角色用户
 	GetUsersByRole(context.Context, *RoleIdReqVo) (*RoleUsersRespVo, error)
 	mustEmbedUnimplementedUserRoleServerServer()
 }
@@ -677,6 +703,537 @@ var UserRoleServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersByRole",
 			Handler:    _UserRoleServer_GetUsersByRole_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/user_server.proto",
+}
+
+const (
+	Permissions_CreatePermission_FullMethodName    = "/user_server.Permissions/CreatePermission"
+	Permissions_GetPermission_FullMethodName       = "/user_server.Permissions/GetPermission"
+	Permissions_GetPermissionByName_FullMethodName = "/user_server.Permissions/GetPermissionByName"
+)
+
+// PermissionsClient is the client API for Permissions service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// 权限服务
+type PermissionsClient interface {
+	// 创建新权限
+	CreatePermission(ctx context.Context, in *CreatePermissionReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error)
+	// 获取权限信息
+	GetPermission(ctx context.Context, in *PermissionIdReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error)
+	// 从名称获取权限
+	GetPermissionByName(ctx context.Context, in *PermissionNameReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error)
+}
+
+type permissionsClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPermissionsClient(cc grpc.ClientConnInterface) PermissionsClient {
+	return &permissionsClient{cc}
+}
+
+func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePermissionReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PermissionInfoRespVo)
+	err := c.cc.Invoke(ctx, Permissions_CreatePermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *permissionsClient) GetPermission(ctx context.Context, in *PermissionIdReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PermissionInfoRespVo)
+	err := c.cc.Invoke(ctx, Permissions_GetPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *permissionsClient) GetPermissionByName(ctx context.Context, in *PermissionNameReqVo, opts ...grpc.CallOption) (*PermissionInfoRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PermissionInfoRespVo)
+	err := c.cc.Invoke(ctx, Permissions_GetPermissionByName_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PermissionsServer is the server API for Permissions service.
+// All implementations must embed UnimplementedPermissionsServer
+// for forward compatibility
+//
+// 权限服务
+type PermissionsServer interface {
+	// 创建新权限
+	CreatePermission(context.Context, *CreatePermissionReqVo) (*PermissionInfoRespVo, error)
+	// 获取权限信息
+	GetPermission(context.Context, *PermissionIdReqVo) (*PermissionInfoRespVo, error)
+	// 从名称获取权限
+	GetPermissionByName(context.Context, *PermissionNameReqVo) (*PermissionInfoRespVo, error)
+	mustEmbedUnimplementedPermissionsServer()
+}
+
+// UnimplementedPermissionsServer must be embedded to have forward compatible implementations.
+type UnimplementedPermissionsServer struct {
+}
+
+func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreatePermissionReqVo) (*PermissionInfoRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePermission not implemented")
+}
+func (UnimplementedPermissionsServer) GetPermission(context.Context, *PermissionIdReqVo) (*PermissionInfoRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPermission not implemented")
+}
+func (UnimplementedPermissionsServer) GetPermissionByName(context.Context, *PermissionNameReqVo) (*PermissionInfoRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionByName not implemented")
+}
+func (UnimplementedPermissionsServer) mustEmbedUnimplementedPermissionsServer() {}
+
+// UnsafePermissionsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PermissionsServer will
+// result in compilation errors.
+type UnsafePermissionsServer interface {
+	mustEmbedUnimplementedPermissionsServer()
+}
+
+func RegisterPermissionsServer(s grpc.ServiceRegistrar, srv PermissionsServer) {
+	s.RegisterService(&Permissions_ServiceDesc, srv)
+}
+
+func _Permissions_CreatePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePermissionReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionsServer).CreatePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permissions_CreatePermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionsServer).CreatePermission(ctx, req.(*CreatePermissionReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Permissions_GetPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionIdReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionsServer).GetPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permissions_GetPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionsServer).GetPermission(ctx, req.(*PermissionIdReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Permissions_GetPermissionByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionNameReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionsServer).GetPermissionByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permissions_GetPermissionByName_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionsServer).GetPermissionByName(ctx, req.(*PermissionNameReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Permissions_ServiceDesc is the grpc.ServiceDesc for Permissions service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Permissions_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user_server.Permissions",
+	HandlerType: (*PermissionsServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreatePermission",
+			Handler:    _Permissions_CreatePermission_Handler,
+		},
+		{
+			MethodName: "GetPermission",
+			Handler:    _Permissions_GetPermission_Handler,
+		},
+		{
+			MethodName: "GetPermissionByName",
+			Handler:    _Permissions_GetPermissionByName_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/user_server.proto",
+}
+
+const (
+	RolePermissions_AssignPermissionToRole_FullMethodName   = "/user_server.RolePermissions/AssignPermissionToRole"
+	RolePermissions_RemovePermissionFromRole_FullMethodName = "/user_server.RolePermissions/RemovePermissionFromRole"
+	RolePermissions_GetPermissionsByRole_FullMethodName     = "/user_server.RolePermissions/GetPermissionsByRole"
+	RolePermissions_GetRolesByPermission_FullMethodName     = "/user_server.RolePermissions/GetRolesByPermission"
+	RolePermissions_RoleHasPermission_FullMethodName        = "/user_server.RolePermissions/RoleHasPermission"
+)
+
+// RolePermissionsClient is the client API for RolePermissions service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// 角色权限服务
+type RolePermissionsClient interface {
+	// 分配权限给角色
+	AssignPermissionToRole(ctx context.Context, in *RolePermissionReqVo, opts ...grpc.CallOption) (*RolePermissionRespVo, error)
+	// 移除角色的权限
+	RemovePermissionFromRole(ctx context.Context, in *RolePermissionReqVo, opts ...grpc.CallOption) (*RolePermissionRespVo, error)
+	// 获取角色的权限
+	GetPermissionsByRole(ctx context.Context, in *RoleIdReqVo, opts ...grpc.CallOption) (*RolePermissionsRespVo, error)
+	// 获取具有某权限的角色
+	GetRolesByPermission(ctx context.Context, in *PermissionIdReqVo, opts ...grpc.CallOption) (*PermissionRolesRespVo, error)
+	// 检查角色是否具有某权限
+	RoleHasPermission(ctx context.Context, in *RoleIdPermissionIdReqVo, opts ...grpc.CallOption) (*BoolRespVo, error)
+}
+
+type rolePermissionsClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewRolePermissionsClient(cc grpc.ClientConnInterface) RolePermissionsClient {
+	return &rolePermissionsClient{cc}
+}
+
+func (c *rolePermissionsClient) AssignPermissionToRole(ctx context.Context, in *RolePermissionReqVo, opts ...grpc.CallOption) (*RolePermissionRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RolePermissionRespVo)
+	err := c.cc.Invoke(ctx, RolePermissions_AssignPermissionToRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rolePermissionsClient) RemovePermissionFromRole(ctx context.Context, in *RolePermissionReqVo, opts ...grpc.CallOption) (*RolePermissionRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RolePermissionRespVo)
+	err := c.cc.Invoke(ctx, RolePermissions_RemovePermissionFromRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rolePermissionsClient) GetPermissionsByRole(ctx context.Context, in *RoleIdReqVo, opts ...grpc.CallOption) (*RolePermissionsRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RolePermissionsRespVo)
+	err := c.cc.Invoke(ctx, RolePermissions_GetPermissionsByRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rolePermissionsClient) GetRolesByPermission(ctx context.Context, in *PermissionIdReqVo, opts ...grpc.CallOption) (*PermissionRolesRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PermissionRolesRespVo)
+	err := c.cc.Invoke(ctx, RolePermissions_GetRolesByPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rolePermissionsClient) RoleHasPermission(ctx context.Context, in *RoleIdPermissionIdReqVo, opts ...grpc.CallOption) (*BoolRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BoolRespVo)
+	err := c.cc.Invoke(ctx, RolePermissions_RoleHasPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// RolePermissionsServer is the server API for RolePermissions service.
+// All implementations must embed UnimplementedRolePermissionsServer
+// for forward compatibility
+//
+// 角色权限服务
+type RolePermissionsServer interface {
+	// 分配权限给角色
+	AssignPermissionToRole(context.Context, *RolePermissionReqVo) (*RolePermissionRespVo, error)
+	// 移除角色的权限
+	RemovePermissionFromRole(context.Context, *RolePermissionReqVo) (*RolePermissionRespVo, error)
+	// 获取角色的权限
+	GetPermissionsByRole(context.Context, *RoleIdReqVo) (*RolePermissionsRespVo, error)
+	// 获取具有某权限的角色
+	GetRolesByPermission(context.Context, *PermissionIdReqVo) (*PermissionRolesRespVo, error)
+	// 检查角色是否具有某权限
+	RoleHasPermission(context.Context, *RoleIdPermissionIdReqVo) (*BoolRespVo, error)
+	mustEmbedUnimplementedRolePermissionsServer()
+}
+
+// UnimplementedRolePermissionsServer must be embedded to have forward compatible implementations.
+type UnimplementedRolePermissionsServer struct {
+}
+
+func (UnimplementedRolePermissionsServer) AssignPermissionToRole(context.Context, *RolePermissionReqVo) (*RolePermissionRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssignPermissionToRole not implemented")
+}
+func (UnimplementedRolePermissionsServer) RemovePermissionFromRole(context.Context, *RolePermissionReqVo) (*RolePermissionRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePermissionFromRole not implemented")
+}
+func (UnimplementedRolePermissionsServer) GetPermissionsByRole(context.Context, *RoleIdReqVo) (*RolePermissionsRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionsByRole not implemented")
+}
+func (UnimplementedRolePermissionsServer) GetRolesByPermission(context.Context, *PermissionIdReqVo) (*PermissionRolesRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRolesByPermission not implemented")
+}
+func (UnimplementedRolePermissionsServer) RoleHasPermission(context.Context, *RoleIdPermissionIdReqVo) (*BoolRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RoleHasPermission not implemented")
+}
+func (UnimplementedRolePermissionsServer) mustEmbedUnimplementedRolePermissionsServer() {}
+
+// UnsafeRolePermissionsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to RolePermissionsServer will
+// result in compilation errors.
+type UnsafeRolePermissionsServer interface {
+	mustEmbedUnimplementedRolePermissionsServer()
+}
+
+func RegisterRolePermissionsServer(s grpc.ServiceRegistrar, srv RolePermissionsServer) {
+	s.RegisterService(&RolePermissions_ServiceDesc, srv)
+}
+
+func _RolePermissions_AssignPermissionToRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RolePermissionReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RolePermissionsServer).AssignPermissionToRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RolePermissions_AssignPermissionToRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RolePermissionsServer).AssignPermissionToRole(ctx, req.(*RolePermissionReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RolePermissions_RemovePermissionFromRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RolePermissionReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RolePermissionsServer).RemovePermissionFromRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RolePermissions_RemovePermissionFromRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RolePermissionsServer).RemovePermissionFromRole(ctx, req.(*RolePermissionReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RolePermissions_GetPermissionsByRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoleIdReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RolePermissionsServer).GetPermissionsByRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RolePermissions_GetPermissionsByRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RolePermissionsServer).GetPermissionsByRole(ctx, req.(*RoleIdReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RolePermissions_GetRolesByPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionIdReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RolePermissionsServer).GetRolesByPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RolePermissions_GetRolesByPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RolePermissionsServer).GetRolesByPermission(ctx, req.(*PermissionIdReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RolePermissions_RoleHasPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoleIdPermissionIdReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RolePermissionsServer).RoleHasPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RolePermissions_RoleHasPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RolePermissionsServer).RoleHasPermission(ctx, req.(*RoleIdPermissionIdReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// RolePermissions_ServiceDesc is the grpc.ServiceDesc for RolePermissions service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var RolePermissions_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user_server.RolePermissions",
+	HandlerType: (*RolePermissionsServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AssignPermissionToRole",
+			Handler:    _RolePermissions_AssignPermissionToRole_Handler,
+		},
+		{
+			MethodName: "RemovePermissionFromRole",
+			Handler:    _RolePermissions_RemovePermissionFromRole_Handler,
+		},
+		{
+			MethodName: "GetPermissionsByRole",
+			Handler:    _RolePermissions_GetPermissionsByRole_Handler,
+		},
+		{
+			MethodName: "GetRolesByPermission",
+			Handler:    _RolePermissions_GetRolesByPermission_Handler,
+		},
+		{
+			MethodName: "RoleHasPermission",
+			Handler:    _RolePermissions_RoleHasPermission_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/user_server.proto",
+}
+
+const (
+	UserPermissions_UserHasPermission_FullMethodName = "/user_server.UserPermissions/UserHasPermission"
+)
+
+// UserPermissionsClient is the client API for UserPermissions service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// 用户权限服务
+type UserPermissionsClient interface {
+	// 检查用户是否具有某权限
+	UserHasPermission(ctx context.Context, in *UserTokenPermissionIdReqVo, opts ...grpc.CallOption) (*BoolRespVo, error)
+}
+
+type userPermissionsClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUserPermissionsClient(cc grpc.ClientConnInterface) UserPermissionsClient {
+	return &userPermissionsClient{cc}
+}
+
+func (c *userPermissionsClient) UserHasPermission(ctx context.Context, in *UserTokenPermissionIdReqVo, opts ...grpc.CallOption) (*BoolRespVo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BoolRespVo)
+	err := c.cc.Invoke(ctx, UserPermissions_UserHasPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UserPermissionsServer is the server API for UserPermissions service.
+// All implementations must embed UnimplementedUserPermissionsServer
+// for forward compatibility
+//
+// 用户权限服务
+type UserPermissionsServer interface {
+	// 检查用户是否具有某权限
+	UserHasPermission(context.Context, *UserTokenPermissionIdReqVo) (*BoolRespVo, error)
+	mustEmbedUnimplementedUserPermissionsServer()
+}
+
+// UnimplementedUserPermissionsServer must be embedded to have forward compatible implementations.
+type UnimplementedUserPermissionsServer struct {
+}
+
+func (UnimplementedUserPermissionsServer) UserHasPermission(context.Context, *UserTokenPermissionIdReqVo) (*BoolRespVo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserHasPermission not implemented")
+}
+func (UnimplementedUserPermissionsServer) mustEmbedUnimplementedUserPermissionsServer() {}
+
+// UnsafeUserPermissionsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserPermissionsServer will
+// result in compilation errors.
+type UnsafeUserPermissionsServer interface {
+	mustEmbedUnimplementedUserPermissionsServer()
+}
+
+func RegisterUserPermissionsServer(s grpc.ServiceRegistrar, srv UserPermissionsServer) {
+	s.RegisterService(&UserPermissions_ServiceDesc, srv)
+}
+
+func _UserPermissions_UserHasPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserTokenPermissionIdReqVo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserPermissionsServer).UserHasPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserPermissions_UserHasPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserPermissionsServer).UserHasPermission(ctx, req.(*UserTokenPermissionIdReqVo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UserPermissions_ServiceDesc is the grpc.ServiceDesc for UserPermissions service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UserPermissions_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user_server.UserPermissions",
+	HandlerType: (*UserPermissionsServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "UserHasPermission",
+			Handler:    _UserPermissions_UserHasPermission_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

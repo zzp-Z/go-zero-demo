@@ -32,36 +32,20 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 func (l *UpdateUserLogic) UpdateUser(in *user_server.UpdateUserReqVo) (*user_server.JwtTokenRespVo, error) {
 	user, err := l.userModel.FindOneByEmail(l.ctx, in.Email)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("FC452：用户不存在 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "FC452",
-			Message: "用户不存在",
-		}
+		return nil, logic.NewAppError(l.ctx, "FC452", "用户不存在", err)
 	}
 	isPass := l.Tools.CheckPassword(in.Password, user.Password)
 	if !isPass {
-		logx.WithContext(l.ctx).Errorf("FC492：密码错误 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "FC492",
-			Message: "密码错误",
-		}
+		return nil, logic.NewAppError(l.ctx, "FC492", "密码错误", nil)
 	}
 	user.Name = in.NewName
 	err = l.userModel.Update(l.ctx, user)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("FC442：更新用户失败 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "FC442",
-			Message: "更新用户失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "FC442", "更新用户失败", err)
 	}
 	token, err := l.Tools.GenerateJwtToken(user.Id)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("FC642：生成Jwt失败 err:%v", err)
-		return nil, &logic.AppError{
-			Code:    "FC642",
-			Message: "生成Jwt失败",
-		}
+		return nil, logic.NewAppError(l.ctx, "FC642", "生成Jwt失败", err)
 	}
 	return &user_server.JwtTokenRespVo{
 		Token: token,

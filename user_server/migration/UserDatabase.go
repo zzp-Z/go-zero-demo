@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -11,24 +10,15 @@ import (
 )
 
 type Config struct {
-	Database struct {
-		Username  string `yaml:"username"`
-		Password  string `yaml:"password"`
-		Host      string `yaml:"host"`
-		Port      string `yaml:"port"`
-		DBName    string `yaml:"dbname"`
-		Charset   string `yaml:"charset"`
-		ParseTime bool   `yaml:"parseTime"`
-		Loc       string `yaml:"loc"`
-	} `yaml:"database"`
+	DataSource string `yaml:"DataSource"`
 }
 
 func main() {
 	// 从配置文件加载数据库配置
-	config := loadConfig("./config/user_server_database.yaml")
+	config := loadConfig("etc/userServer.yaml")
 
 	// 构建 DSN 连接字符串
-	dsn := buildDSN(config)
+	dsn := config.DataSource
 
 	// 连接 MySQL 数据库
 	db, err := gorm.Open(mysql.New(mysql.Config{
@@ -39,7 +29,13 @@ func main() {
 	}
 
 	// 自动迁移 schema
-	err = db.AutoMigrate(&model.User{}, &model.Role{}, &model.UserRole{})
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.Role{},
+		&model.UserRole{},
+		&model.Permissions{},
+		&model.RolePermissions{},
+	)
 	if err != nil {
 		log.Fatalf("无法自动迁移数据库架构: %v", err)
 	}
@@ -61,18 +57,4 @@ func loadConfig(filename string) *Config {
 	}
 
 	return &config
-}
-
-// buildDSN 根据配置构建 MySQL 数据库连接字符串
-func buildDSN(config *Config) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t&loc=%s",
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Host,
-		config.Database.Port,
-		config.Database.DBName,
-		config.Database.Charset,
-		config.Database.ParseTime,
-		config.Database.Loc,
-	)
 }
