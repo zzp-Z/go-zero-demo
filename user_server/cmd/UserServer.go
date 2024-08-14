@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
 
 	"user_server/internal/config"
 	permissionsServer "user_server/internal/server/permissions"
@@ -62,6 +63,11 @@ func main() {
 	}
 	// 使用找到的端口号设置 ListenOn 字段。
 	c.ListenOn = fmt.Sprintf("%s:%d", c.ListenOn, c.Port)
+
+	// 如果 PodIp 字段不为空，则设置环境变量 POD_IP 为该值。
+	if c.PodIp != "" {
+		_ = os.Setenv("POD_IP", c.PodIp)
+	}
 
 	ctx := svc.NewServiceContext(c)
 
