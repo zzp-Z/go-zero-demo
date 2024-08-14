@@ -1,6 +1,7 @@
 # 以下内容是配置文件模板，请根据实际情况修改，并修改文件名为userServer.yaml
 Name: userServer.rpc
-ListenOn: 0.0.0.0:30000
+ListenOn: 0.0.0.0
+Port: 0 # 端口号 如果为0，则从30,000到40,000随机分配
 DataSource: "root:88888888@tcp(127.0.0.1:3306)/user_server"
 
 Etcd:
